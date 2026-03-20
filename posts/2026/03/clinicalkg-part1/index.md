@@ -42,9 +42,10 @@ This series explores how to bridge that gap:
 # 1. Introduction: The “Tower of Babel” Is Not Just Linguistic
 
 Healthcare systems don’t just speak different “languages”—they encode different worldviews.
-	•	ICD-10 → billing-oriented classification
-	•	SNOMED CT → clinical ontology
-	•	LOINC → lab measurement semantics
+
+- ICD-10 → billing-oriented classification
+- SNOMED CT → clinical ontology
+- LOINC → lab measurement semantics
 
 The common narrative frames this as a terminology problem. That framing is incomplete.
 
