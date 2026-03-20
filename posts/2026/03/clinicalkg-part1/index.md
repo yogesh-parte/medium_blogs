@@ -1,6 +1,5 @@
 ---
-title: "The Clinical Knowledge Bridge (Part-1): Extracting RDF Subgraphs from UMLS with Python"
-=====
+title: The Clinical Knowledge Bridge (Part-1): Extracting RDF Subgraphs from UMLS with Python
 ***How to transform the world’s largest medical metathesaurus into a queryable Linked Data graph for Healthcare AI***
 date: 2026-03-19
 updated: 2026-03-19
