@@ -175,14 +175,15 @@ This implementation is designed for:
 ```python
 import requests
 import time
-from rdflib import Graph, Literal, RDF, Namespace
-from rdflib.namespace import SKOS
-from tqdm import tqdm
+from rdflib import Graph, Literal, RDF, Namespace, URIRef
+from rdflib.namespace import SKOS, RDFS
 
+# Official UMLS Base URI and Namespaces
 UMLS = Namespace("https://uts.nlm.nih.gov/umls/")
 API_KEY = "YOUR_UMLS_API_KEY"
-BASE_URL = "https://uts-ws.nlm.nih.gov/rest/content/current/CUI/"
+BASE_URL = "https://uts-ws.nlm.nih.gov/rest"
 
+# The specific vocabularies you requested
 TARGET_SABS = {
     "SNOMEDCT_US": "SNOMED",
     "ICD10CM": "ICD10",
@@ -191,84 +192,76 @@ TARGET_SABS = {
     "MSH": "MESH"
 }
 
-class UMLSRDFBuilder:
+class UMLSSubgraphExtractor:
     def __init__(self, api_key):
         self.api_key = api_key
         self.g = Graph()
         self.g.bind("umls", UMLS)
         self.g.bind("skos", SKOS)
         self.visited = set()
-        self.last_request_time = 0
-        self.min_interval = 0.1
 
-    def _throttle(self):
-        elapsed = time.time() - self.last_request_time
-        if elapsed < self.min_interval:
-            time.sleep(self.min_interval - elapsed)
-        self.last_request_time = time.time()
-
-    def fetch_data(self, endpoint):
-        self._throttle()
-        url = f"{BASE_URL}{endpoint}apiKey={self.api_key}"
+    def get_data(self, endpoint):
+        """Standard GET request with rate-limiting and API Key."""
+        # Rate limiting: UMLS allows 20 req/sec; we stay safe at 10
+        time.sleep(0.1) 
+        url = f"{BASE_URL}{endpoint}"
+        params = {'apiKey': self.api_key}
+        
         try:
-            response = requests.get(url)
-            if response.status_code == 429:
-                print("Rate limit hit! Sleeping...")
-                time.sleep(5)
-                return self.fetch_data(endpoint)
-            return response.json().get("result", [])
+            response = requests.get(url, params=params)
+            if response.status_code == 200:
+                return response.json().get("result", [])
+            elif response.status_code == 429:
+                time.sleep(2) # Back off if rate-limited
+                return self.get_data(endpoint)
+            return []
         except Exception as e:
-            print(f"Error: {e}")
+            print(f"Connection error: {e}")
             return []
 
-    def build_subgraph(self, seed_cuis, depth=1):
-        queue = [(cui, depth) for cui in seed_cuis]
-        pbar = tqdm(total=len(queue), desc="Building Graph")
+    def extract(self, cui, depth=1):
+        if cui in self.visited or depth < 0:
+            return
+        
+        self.visited.add(cui)
+        cui_uri = UMLS[cui]
+        self.g.add((cui_uri, RDF.type, SKOS.Concept))
 
-        while queue:
-            cui, current_depth = queue.pop(0)
+        # 1. Official 'Atoms' Logic: Get Source Codes (SNOMED, ICD, LOINC, etc.)
+        atoms = self.get_data(f"/content/current/CUI/{cui}/atoms")
+        for atom in atoms:
+            sab = atom.get("rootSource")
+            if sab in TARGET_SABS:
+                # Store the code as a notation and the name as a label
+                code = atom.get("code", "").split("/")[-1]
+                name = atom.get("name")
+                self.g.add((cui_uri, SKOS.notation, Literal(f"{sab}:{code}")))
+                self.g.add((cui_uri, SKOS.prefLabel, Literal(name, lang="en")))
 
-            if cui in self.visited:
-                pbar.update(1)
-                continue
+        # 2. Official 'Relations' Logic: Build the Graph Edges
+        if depth > 0:
+            relations = self.get_data(f"/content/current/CUI/{cui}/relations")
+            for rel in relations:
+                # Filter for meaningful relationships
+                target_uri_str = rel.get("relatedId", "")
+                target_cui = target_uri_str.split("/")[-1]
+                rel_label = rel.get("additionalRelationLabel", "related_to")
+                
+                if target_cui and rel_label:
+                    target_node = UMLS[target_cui]
+                    # Create the edge
+                    self.g.add((cui_uri, UMLS[rel_label], target_node))
+                    # Recurse
+                    self.extract(target_cui, depth - 1)
 
-            self.visited.add(cui)
-            cui_uri = UMLS[cui]
-            self.g.add((cui_uri, RDF.type, SKOS.Concept))
+    def save(self, filename="subgraph.ttl"):
+        self.g.serialize(destination=filename, format="turtle")
+        print(f"Success! RDF subgraph saved to {filename}")
 
-            atoms = self.fetch_data(f"{cui}/atoms?")
-            for atom in atoms:
-                sab = atom.get("rootSource")
-                if sab in TARGET_SABS:
-                    code = atom.get("code", "").split("/")[-1]
-                    name = atom.get("name")
-                    self.g.add((cui_uri, SKOS.notation, Literal(f"{sab}:{code}")))
-                    self.g.add((cui_uri, SKOS.prefLabel, Literal(name, lang="en")))
-
-            if current_depth > 0:
-                rels = self.fetch_data(f"{cui}/relations?")
-                for rel in rels:
-                    target_cui = rel.get("relatedId", "").split("/")[-1]
-                    rel_label = rel.get("additionalRelationLabel", "related_to")
-
-                    target_uri = UMLS[target_cui]
-                    self.g.add((cui_uri, UMLS[rel_label], target_uri))
-
-                    if target_cui not in self.visited:
-                        queue.append((target_cui, current_depth - 1))
-                        pbar.total += 1
-
-            pbar.update(1)
-
-        pbar.close()
-        return self.g
-
-
-builder = UMLSRDFBuilder(API_KEY)
-rdf_graph = builder.build_subgraph(["C0012634"], depth=1)
-
-with open("umls_subgraph.ttl", "wb") as f:
-    f.write(rdf_graph.serialize(format="turtle").encode("utf-8"))
+# Usage for your Article
+extractor = UMLSSubgraphExtractor(API_KEY)
+extractor.extract("C0012634", depth=1) # Example: Heart Failure
+extractor.save("umls_clinical_graph.ttl")
 
 ```
 ⸻
