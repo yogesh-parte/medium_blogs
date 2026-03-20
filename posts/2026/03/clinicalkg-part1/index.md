@@ -27,18 +27,19 @@ The Clinical Knowledge Bridge (Part 1): Extracting RDF Subgraphs from UMLS with 
 
 ---
 
-Series Overview
+**Series Overview**
 
 Healthcare AI is at an inflection point. Large Language Models (LLMs) are powerful—but ungrounded. Clinical ontologies are precise—but underutilized.
 
 This series explores how to bridge that gap:
-	•	Part 1 (this article): Extracting RDF subgraphs from UMLS
-	•	Part 2: Storing and querying clinical graphs with GraphDB / SPARQL
-	•	Part 3: Integrating Knowledge Graphs with LLMs (Neuro-symbolic AI)
+
+- Part 1 (this article): Extracting RDF subgraphs from UMLS
+- Part 2: Storing and querying clinical graphs with GraphDB / SPARQL
+- Part 3: Integrating Knowledge Graphs with LLMs (Neuro-symbolic AI)
 
 ⸻
 
-1. Introduction: The “Tower of Babel” Is Not Just Linguistic
+# 1. Introduction: The “Tower of Babel” Is Not Just Linguistic
 
 Healthcare systems don’t just speak different “languages”—they encode different worldviews.
 	•	ICD-10 → billing-oriented classification
@@ -47,119 +48,128 @@ Healthcare systems don’t just speak different “languages”—they encode di
 
 The common narrative frames this as a terminology problem. That framing is incomplete.
 
-Critical View
+## Critical View
 
 This is not just about vocabulary mismatch—it is about:
-	•	Different abstractions of disease
-	•	Different granularity of meaning
-	•	Different institutional incentives
+
+- Different abstractions of disease
+- Different granularity of meaning
+- Different institutional incentives
 
 The Unified Medical Language System (UMLS) attempts to unify these via Concept Unique Identifiers (CUIs) [1].
 
 But UMLS in its raw form is:
-	•	Tabular (RRF files)
-	•	API-driven (REST endpoints)
-	•	Not inherently “reasoning-ready”
+
+- Tabular (RRF files)
+- API-driven (REST endpoints)
+- Not inherently “reasoning-ready”
 
 To make it useful for modern AI, we need to transform it into a graph of relationships, not just a lookup table.
 
 ⸻
 
-2. Why RDF? Representation vs Reality
+## 2. Why RDF? Representation vs Reality
 
-Neutral View
+### Neutral View
 
 RDF (Resource Description Framework) models knowledge as triples:
 
-Subject → Predicate → Object
+- Subject
+- Predicate
+- Object
 
 This enables:
-	•	Traversable relationships
-	•	Schema interoperability
-	•	Querying via SPARQL
 
-Example
+- Traversable relationships
+- Schema interoperability
+- Querying via SPARQL
+
+### Example
 
 Instead of:
 
-“Heart Failure = C0012634”
+> “Heart Failure = C0012634”
 
 We get:
-	•	Heart Failure → is-a → Cardiovascular Disease
-	•	Heart Failure → has finding site → Heart Structure
 
-Philosophical Tension
+- Heart Failure → is-a → Cardiovascular Disease
+- Heart Failure → has finding site → Heart Structure
 
-RDF assumes:
+### Philosophical Tension
 
-Reality can be modeled as discrete, logical relationships.
+RDF assumes that reality can be modeled as discrete, logical relationships.
 
 But clinical reality is:
-	•	Probabilistic
-	•	Context-dependent
-	•	Often ambiguous
 
-Devil’s Advocate
-	•	RDF graphs can create a false sense of certainty
-	•	They encode consensus knowledge, not necessarily truth
-	•	They struggle with uncertainty compared to probabilistic models
+- Probabilistic
+- Context-dependent
+- Often ambiguous
+
+### Devil’s Advocate
+
+- RDF graphs can create a false sense of certainty
+- They encode consensus knowledge, not necessarily truth
+- They struggle with uncertainty compared to probabilistic models
 
 Still, they provide something LLMs lack:
 
-Explicit, inspectable reasoning paths
+- Explicit, inspectable reasoning paths
 
 ⸻
 
-3. The Practical Constraint: UMLS API Limits
+## 3. The Practical Constraint: UMLS API Limits
 
 The UMLS REST API allows:
 
-20 requests per second [2]
+- 20 requests per second [2]
 
 This is not a minor implementation detail—it fundamentally shapes system design.
 
-What breaks naive approaches?
-	•	Recursive traversal explodes quickly
-	•	Redundant API calls waste bandwidth
-	•	Rate limits trigger HTTP 429 errors
+### What breaks naive approaches?
 
-Incorrect Assumption
+- Recursive traversal explodes quickly
+- Redundant API calls waste bandwidth
+- Rate limits trigger HTTP 429 errors
 
-“We’ll just parallelize.”
+### Incorrect Assumption
+
+> “We’ll just parallelize.”
 
 You can’t scale past an external bottleneck.
 
 ⸻
 
-4. Engineering Strategy: Controlled Knowledge Extraction
+## 4. Engineering Strategy: Controlled Knowledge Extraction
 
 To build a stable RDF extraction pipeline, we need:
 
 1. Throttling
 
-Operate below the limit (~10 req/sec) for stability.
+   Operate below the limit (~10 req/sec) for stability.
 
 2. Caching (Memoization)
 
-Avoid fetching the same CUI multiple times.
+   Avoid fetching the same CUI multiple times.
 
 3. Breadth-First Search (BFS)
 
-Control graph expansion using depth-limited traversal.
+   Control graph expansion using depth-limited traversal.
 
-Why BFS?
-	•	Prevents runaway recursion
-	•	Ensures uniform exploration
-	•	Easier to bound computational cost
+### Why BFS?
+
+- Prevents runaway recursion
+- Ensures uniform exploration
+- Easier to bound computational cost
 
 ⸻
 
-5. Python ETL Pipeline: UMLS → RDF
+## 5. Python ETL Pipeline: UMLS → RDF
 
 This implementation is designed for:
-	•	Robustness under rate limits
-	•	Transparency (progress tracking)
-	•	Reusability for healthcare pipelines
+
+- Robustness under rate limits
+- Transparency (progress tracking)
+- Reusability for healthcare pipelines
 
 import requests
 import time
@@ -261,98 +271,101 @@ with open("umls_subgraph.ttl", "wb") as f:
 
 ⸻
 
-6. Output: From Codes to Context
+## 6. Output: From Codes to Context
 
 The result is a Turtle (.ttl) file representing a semantic subgraph.
 
-Example:
-	•	umls:C0012634 → Heart Failure
-	•	Relationships → anatomy, hierarchy, associations
-	•	Mappings → SNOMED, ICD-10, MeSH
+### Example
+
+- umls:C0012634 → Heart Failure
+- Relationships → anatomy, hierarchy, associations
+- Mappings → SNOMED, ICD-10, MeSH
 
 This transforms:
 
-Static codes → Dynamic clinical knowledge
+- Static codes → Dynamic clinical knowledge
 
 ⸻
 
-7. Performance Reality Check
+## 7. Performance Reality Check
 
 A critical (often ignored) constraint:
-	•	Depth = 1 → manageable
-	•	Depth = 2 → hundreds of nodes
-	•	Depth ≥ 3 → impractical via API
 
-Recommendation
+- Depth = 1 → manageable
+- Depth = 2 → hundreds of nodes
+- Depth ≥ 3 → impractical via API
+
+### Recommendation
 
 For production systems:
-	•	Download UMLS RRF files
-	•	Load into PostgreSQL
-	•	Perform local graph extraction
 
-Contrarian View
+- Download UMLS RRF files
+- Load into PostgreSQL
+- Perform local graph extraction
 
-If you’re doing this at scale:
+### Contrarian View
 
-The REST API approach may be the wrong abstraction entirely.
-
-⸻
-
-8. What This Enables (and What It Doesn’t)
-
-What it enables
-	•	Structured clinical reasoning
-	•	Cross-ontology mapping
-	•	Explainable AI pipelines
-
-What it does NOT solve
-	•	Clinical uncertainty
-	•	Missing or biased knowledge
-	•	Real-time inference at scale
+If you’re doing this at scale, the REST API approach may be the wrong abstraction entirely.
 
 ⸻
 
-9. Toward Neuro-Symbolic Healthcare AI
+## 8. What This Enables (and What It Doesn’t)
 
-This pipeline is a stepping stone toward:
+### What it enables
 
-Hybrid systems combining symbolic graphs + LLMs
+- Structured clinical reasoning
+- Cross-ontology mapping
+- Explainable AI pipelines
 
-Why this matters
-	•	LLMs → fluent but unreliable
-	•	Knowledge graphs → precise but rigid
+### What it does NOT solve
 
-Together:
+- Clinical uncertainty
+- Missing or biased knowledge
+- Real-time inference at scale
 
-Potentially accurate AND explainable AI
+⸻
 
-Skeptical Note
+## 9. Toward Neuro-Symbolic Healthcare AI
+
+This pipeline is a stepping stone toward hybrid systems combining symbolic graphs + LLMs.
+
+### Why this matters
+
+- LLMs → fluent but unreliable
+- Knowledge graphs → precise but rigid
+
+**Together:** Potentially accurate AND explainable AI
+
+### Skeptical Note
 
 Neuro-symbolic AI is still:
-	•	Experimentally promising
-	•	Not widely validated in production healthcare
+
+- Experimentally promising
+- Not widely validated in production healthcare
 
 ⸻
 
-10. Conclusion: Building the Bridge
+## 10. Conclusion: Building the Bridge
 
 Extracting RDF subgraphs from UMLS is not just a data transformation task—it is an architectural shift:
-	•	From lookup → relationships
-	•	From data → meaning
-	•	From generation → reasoning
+
+- From lookup → relationships
+- From data → meaning
+- From generation → reasoning
 
 But it comes with trade-offs:
-	•	Complexity
-	•	Performance constraints
-	•	Modeling assumptions
+
+- Complexity
+- Performance constraints
+- Modeling assumptions
 
 The real question is not:
 
-“Can we build knowledge graphs?”
+> “Can we build knowledge graphs?”
 
 But:
 
-“Where do they genuinely outperform simpler systems?”
+> “Where do they genuinely outperform simpler systems?”
 
 ⸻
 
@@ -366,12 +379,12 @@ References (IEEE Style)
 
 ⸻
 
-Author’s Note: 
+Author’s Note:
 
 If you’re working on healthcare AI, semantic layers, or knowledge graphs, I’d be interested in what you think:
-_Where in Symbolic systems still outperform purely statistical AI - and where they don’t._
+
+*Where do symbolic systems still outperform purely statistical AI — and where do they not?*
 
 ⸻
-
 
 [Back to 2026](../README.md) | [← February 2026](../02) | [April 2026 →](../04)
