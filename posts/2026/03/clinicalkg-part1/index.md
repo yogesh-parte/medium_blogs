@@ -172,6 +172,7 @@ This implementation is designed for:
 - Transparency (progress tracking)
 - Reusability for healthcare pipelines
 
+```python
 import requests
 import time
 from rdflib import Graph, Literal, RDF, Namespace
@@ -269,7 +270,7 @@ rdf_graph = builder.build_subgraph(["C0012634"], depth=1)
 with open("umls_subgraph.ttl", "wb") as f:
     f.write(rdf_graph.serialize(format="turtle").encode("utf-8"))
 
-
+```
 ⸻
 
 ## 6. Output: From Codes to Context
