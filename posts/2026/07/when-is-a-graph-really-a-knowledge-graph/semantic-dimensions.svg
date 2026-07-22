@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Six dimensions of a healthcare semantic knowledge graph</title>
+  <desc id="desc">Editorial infographic showing identity, standards, validation, provenance, time, and inference around a clinical semantic graph.</desc>
+  <rect width="1600" height="900" fill="#FAFAF7"/>
+  <text x="800" y="92" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="52" font-weight="700" fill="#17212B">What Turns a Graph into Clinical Knowledge?</text>
+  <text x="800" y="140" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="24" fill="#63707B">Six semantic commitments that links and embeddings alone do not provide</text>
+
+  <circle cx="800" cy="465" r="180" fill="#E6F1EC" stroke="#3D7562" stroke-width="4"/>
+  <text x="800" y="430" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="32" font-weight="700" fill="#204B3C">Clinical Semantic</text>
+  <text x="800" y="470" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="32" font-weight="700" fill="#204B3C">Knowledge Graph</text>
+  <text x="800" y="520" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="21" fill="#4D6D62">FHIR • RDF • Ontologies</text>
+
+  <g font-family="Inter, Arial, sans-serif">
+    <rect x="120" y="215" width="370" height="150" rx="24" fill="#EDF1F5" stroke="#C8D2DB"/>
+    <text x="155" y="265" font-size="28" font-weight="700" fill="#243746">1. Identity</text>
+    <text x="155" y="305" font-size="19" fill="#52616D">Stable patient, encounter, clinician</text>
+    <text x="155" y="334" font-size="19" fill="#52616D">and terminology identifiers</text>
+
+    <rect x="1110" y="215" width="370" height="150" rx="24" fill="#EDF1F5" stroke="#C8D2DB"/>
+    <text x="1145" y="265" font-size="28" font-weight="700" fill="#243746">2. Standards</text>
+    <text x="1145" y="305" font-size="19" fill="#52616D">SNOMED CT, LOINC, RxNorm,</text>
+    <text x="1145" y="334" font-size="19" fill="#52616D">UCUM and FHIR bindings</text>
+
+    <rect x="70" y="440" width="390" height="150" rx="24" fill="#F1ECE5" stroke="#D6C5AD"/>
+    <text x="105" y="490" font-size="28" font-weight="700" fill="#59452E">3. Validation</text>
+    <text x="105" y="530" font-size="19" fill="#6E5C47">SHACL shapes, datatypes, required</text>
+    <text x="105" y="559" font-size="19" fill="#6E5C47">fields and quality constraints</text>
+
+    <rect x="1140" y="440" width="390" height="150" rx="24" fill="#F1ECE5" stroke="#D6C5AD"/>
+    <text x="1175" y="490" font-size="28" font-weight="700" fill="#59452E">4. Provenance</text>
+    <text x="1175" y="530" font-size="19" fill="#6E5C47">Source, author, extraction method,</text>
+    <text x="1175" y="559" font-size="19" fill="#6E5C47">confidence and human validation</text>
+
+    <rect x="120" y="665" width="370" height="150" rx="24" fill="#EEEAF5" stroke="#CCC0DE"/>
+    <text x="155" y="715" font-size="28" font-weight="700" fill="#493B62">5. Time</text>
+    <text x="155" y="755" font-size="19" fill="#655777">Onset, event, recorded, abatement</text>
+    <text x="155" y="784" font-size="19" fill="#655777">and assertion time</text>
+
+    <rect x="1110" y="665" width="370" height="150" rx="24" fill="#EEEAF5" stroke="#CCC0DE"/>
+    <text x="1145" y="715" font-size="28" font-weight="700" fill="#493B62">6. Inference</text>
+    <text x="1145" y="755" font-size="19" fill="#655777">Entailed facts, clinical rules and</text>
+    <text x="1145" y="784" font-size="19" fill="#655777">governed multi-hop conclusions</text>
+  </g>
+
+  <g stroke="#82928B" stroke-width="3" fill="none">
+    <path d="M490 290 C610 300 625 345 665 370"/>
+    <path d="M1110 290 C990 300 975 345 935 370"/>
+    <path d="M460 515 C590 515 610 500 620 490"/>
+    <path d="M1140 515 C1010 515 990 500 980 490"/>
+    <path d="M490 740 C610 700 630 630 665 585"/>
+    <path d="M1110 740 C990 700 970 630 935 585"/>
+  </g>
+</svg>
