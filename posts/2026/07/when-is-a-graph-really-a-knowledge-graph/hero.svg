@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">From linked notes to a clinical semantic knowledge graph</title>
+  <desc id="desc">Editorial infographic contrasting a note graph with an ontology-aligned healthcare knowledge graph.</desc>
+  <rect width="1600" height="900" fill="#FAFAF7"/>
+  <text x="110" y="120" font-family="Inter, Arial, sans-serif" font-size="58" font-weight="700" fill="#17212B">When Is a Graph Really a Knowledge Graph?</text>
+  <text x="110" y="178" font-family="Inter, Arial, sans-serif" font-size="27" fill="#5B6773">From linked information to standardized, evidence-backed clinical meaning</text>
+
+  <rect x="90" y="245" width="610" height="500" rx="28" fill="#F0F2F3" stroke="#D5DADD"/>
+  <text x="140" y="305" font-family="Inter, Arial, sans-serif" font-size="32" font-weight="700" fill="#28333D">Linked note graph</text>
+  <text x="140" y="345" font-family="Inter, Arial, sans-serif" font-size="21" fill="#68737D">Pages, backlinks, mentions and associations</text>
+  <g stroke="#7D8790" stroke-width="4">
+    <line x1="275" y1="470" x2="430" y2="405"/><line x1="275" y1="470" x2="445" y2="545"/>
+    <line x1="430" y1="405" x2="555" y2="485"/><line x1="445" y1="545" x2="555" y2="485"/>
+    <line x1="430" y1="405" x2="360" y2="635"/><line x1="445" y1="545" x2="360" y2="635"/>
+  </g>
+  <g fill="#68737D">
+    <circle cx="275" cy="470" r="26"/><circle cx="430" cy="405" r="26"/><circle cx="445" cy="545" r="26"/>
+    <circle cx="555" cy="485" r="26"/><circle cx="360" cy="635" r="26"/>
+  </g>
+  <text x="185" y="705" font-family="Inter, Arial, sans-serif" font-size="22" fill="#38434D">Useful for navigation and discovery</text>
+
+  <path d="M735 495 H855" stroke="#315F9B" stroke-width="14" stroke-linecap="round"/>
+  <path d="M835 463 L875 495 L835 527" fill="none" stroke="#315F9B" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <rect x="900" y="245" width="610" height="500" rx="28" fill="#E9F2EE" stroke="#B9D4C8"/>
+  <text x="950" y="305" font-family="Inter, Arial, sans-serif" font-size="32" font-weight="700" fill="#173D31">Clinical semantic graph</text>
+  <text x="950" y="345" font-family="Inter, Arial, sans-serif" font-size="21" fill="#466A5E">Typed meaning, standards, evidence and inference</text>
+  <g stroke="#3C7665" stroke-width="4">
+    <line x1="1050" y1="475" x2="1190" y2="405"/><line x1="1050" y1="475" x2="1190" y2="555"/>
+    <line x1="1190" y1="405" x2="1365" y2="475"/><line x1="1190" y1="555" x2="1365" y2="475"/>
+  </g>
+  <g font-family="Inter, Arial, sans-serif" text-anchor="middle">
+    <circle cx="1050" cy="475" r="52" fill="#2E6E5A"/><text x="1050" y="482" font-size="19" fill="white">Patient</text>
+    <circle cx="1190" cy="405" r="58" fill="#497DAD"/><text x="1190" y="412" font-size="18" fill="white">Condition</text>
+    <circle cx="1190" cy="555" r="58" fill="#8B6FAE"/><text x="1190" y="562" font-size="18" fill="white">Observation</text>
+    <circle cx="1365" cy="475" r="58" fill="#C8843E"/><text x="1365" y="482" font-size="18" fill="white">Medication</text>
+  </g>
+  <g font-family="Inter, Arial, sans-serif" font-size="16" fill="#31584C" text-anchor="middle">
+    <text x="1117" y="420">hasCondition</text><text x="1118" y="545">hasObservation</text>
+    <text x="1282" y="420">mayBeTreatedBy</text><text x="1284" y="548">supportsReview</text>
+  </g>
+  <text x="970" y="705" font-family="Inter, Arial, sans-serif" font-size="22" fill="#274C40">Standardized • interoperable • computable</text>
+
+  <rect x="315" y="790" width="970" height="64" rx="18" fill="#E8EEF6"/>
+  <text x="800" y="832" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="25" font-weight="600" fill="#254F85">More connections do not automatically mean more knowledge.</text>
+</svg>
